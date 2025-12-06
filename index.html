@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?= include('Stylesheet'); ?> 
+  <title>Cari Nilai</title>
+</head>
+<body>
+  <div class="container">
+    <h2 class="mt-4">Cari Nilai Siswa</h2>
+    <div class="form-group">
+      <label for="studentName">Nama Siswa:</label>
+      <input type="text" id="studentName" class="form-control" placeholder="Contoh: Siti Fitriyani">
+    </div>
+    
+    <button class="btn btn-primary btn-block" onclick="searchData()">Cari</button>
+    
+    <div id="output" class="mt-4">Hasil akan muncul di sini...</div>
+  </div>
+
+  <script>
+    // Fungsi yang dipanggil saat tombol "Cari" diklik
+    function searchData() {
+      var name = document.getElementById('studentName').value.trim(); 
+      
+      // Tampilkan pesan loading
+      document.getElementById('output').innerHTML = '<div class="alert alert-info">⏳ Mencari data...</div>';
+      
+      // Panggil fungsi Apps Script di Code.gs
+      google.script.run
+          .withSuccessHandler(displayResult) // Jika berhasil
+          .searchNilai(name); 
+    }
+
+    // Fungsi callback untuk menampilkan hasil dari backend
+    function displayResult(result) {
+      document.getElementById('output').innerHTML = result;
+    }
+  </script>
+</body>
+</html>
