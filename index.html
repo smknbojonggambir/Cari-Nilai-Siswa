@@ -1,38 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <base target="_top">
-  <?= include('Stylesheet'); ?> 
-  <title>Cari Nilai</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cari Nilai Siswa (GitHub)</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; padding: 20px; }
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2 class="mt-3 mb-4 text-center">Cari Nilai Siswa</h2>
-    <div class="form-group">
-      <label for="studentName">Nama Siswa:</label>
-      <input type="text" id="studentName" class="form-control" placeholder="Contoh: Siti Fitriyani">
+    <div class="container">
+        <h2 class="mt-3 mb-4 text-center">Cari Nilai Siswa</h2>
+        
+        <div class="form-group">
+            <label for="studentName">Nama Siswa:</label>
+            <input type="text" id="studentName" class="form-control" placeholder="Contoh: Rikza Dzipfikri">
+        </div>
+        
+        <button class="btn btn-primary btn-block" onclick="searchData()">Cari</button>
+        
+        <div id="output" class="mt-4">Hasil akan muncul di sini...</div>
     </div>
-    
-    <button class="btn btn-primary btn-block" onclick="searchData()">Cari</button>
-    
-    <div id="output" class="mt-4">Hasil akan muncul di sini...</div>
-  </div>
 
-  <script>
-    function searchData() {
-      var name = document.getElementById('studentName').value.trim(); 
-      
-      // Menggunakan kelas alert-info Bootstrap untuk pesan loading
-      document.getElementById('output').innerHTML = '<div class="alert alert-info">⏳ Mencari data...</div>';
-      
-      google.script.run
-          .withSuccessHandler(displayResult)
-          .searchNilai(name); 
-    }
+    <script>
+        // *******************************************************************
+        // * KUNCI: GANTI DENGAN URL API YANG ANDA DAPATKAN DARI LANGKAH 2! *
+        // *******************************************************************
+        const API_URL = "https://script.google.com/macros/s/AKfycbyqCLFXXYhjioibiwrC57yHqd3LP37sHK04THUX4cO6WyrAC24E5woRrivr4LpdERA/exec"; 
 
-    function displayResult(result) {
-      document.getElementById('output').innerHTML = result;
-    }
-  </script>
+        async function searchData() {
+            const nameInput = document.getElementById('studentName').value.trim();
+            const outputDiv = document.getElementById('output');
+            
+            if (!nameInput) {
+                outputDiv.innerHTML = '<div class="alert alert-warning">Masukkan nama siswa.</div>';
+                return;
+            }
+
+            outputDiv.innerHTML = '<div class="alert alert-info">⏳ Mencari data...</div>';
+
+            // Membuat URL lengkap untuk memanggil API dengan parameter 'nama'
+            const fullUrl = `${API_URL}?nama=${encodeURIComponent(nameInput)}`;
+
+            try {
+                const response = await fetch(fullUrl);
+                const result = await response.json(); // Menerima JSON dari Apps Script
+
+                if (result.status === 'success') {
+                    outputDiv.innerHTML = 
+                        `<div class="alert alert-success">🎉 Hasil Ditemukan<hr>
+                        <strong>Nama:</strong> ${result.nama}<br>
+                        <strong>Kelas:</strong> ${result.kelas}<br>
+                        <strong>Mata Pelajaran:</strong> ${result.mapel}<br>
+                        <strong>Nilai Akhir:</strong> ${result.nilai}</div>`;
+
+                } else if (result.status === 'not_found') {
+                    outputDiv.innerHTML = 
+                        `<div class="alert alert-warning">❌ Nama <strong>${nameInput}</strong> tidak ditemukan dalam daftar.</div>`;
+                } else {
+                    // Menangani error umum (misalnya: gagal akses Sheet)
+                    outputDiv.innerHTML = 
+                        `<div class="alert alert-danger">🛑 Error API: ${result.message}</div>`;
+                }
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                outputDiv.innerHTML = 
+                    '<div class="alert alert-danger">Gagal menghubungi server data. Cek koneksi internet atau URL API.</div>';
+            }
+        }
+    </script>
 </body>
 </html>
