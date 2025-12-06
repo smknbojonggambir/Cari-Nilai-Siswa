@@ -7,7 +7,7 @@
 </head>
 <body>
   <div class="container">
-    <h2 class="mt-4">Cari Nilai Siswa</h2>
+    <h2 class="mt-3 mb-4 text-center">Cari Nilai Siswa</h2>
     <div class="form-group">
       <label for="studentName">Nama Siswa:</label>
       <input type="text" id="studentName" class="form-control" placeholder="Contoh: Siti Fitriyani">
@@ -19,20 +19,17 @@
   </div>
 
   <script>
-    // Fungsi yang dipanggil saat tombol "Cari" diklik
     function searchData() {
       var name = document.getElementById('studentName').value.trim(); 
       
-      // Tampilkan pesan loading
+      // Menggunakan kelas alert-info Bootstrap untuk pesan loading
       document.getElementById('output').innerHTML = '<div class="alert alert-info">⏳ Mencari data...</div>';
       
-      // Panggil fungsi Apps Script di Code.gs
       google.script.run
-          .withSuccessHandler(displayResult) // Jika berhasil
+          .withSuccessHandler(displayResult)
           .searchNilai(name); 
     }
 
-    // Fungsi callback untuk menampilkan hasil dari backend
     function displayResult(result) {
       document.getElementById('output').innerHTML = result;
     }
