@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cari Nilai Siswa (GitHub)</title>
+    <title>Cari Nilai Siswa</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body { background-color: #f8f9fa; padding: 20px; }
@@ -23,7 +23,7 @@
         
         <div class="form-group">
             <label for="studentName">Nama Siswa:</label>
-            <input type="text" id="studentName" class="form-control" placeholder="Contoh: Rikza Dzipfikri">
+            <input type="text" id="studentName" class="form-control" placeholder="Contoh: Siti Fitriyani">
         </div>
         
         <button class="btn btn-primary btn-block" onclick="searchData()">Cari</button>
@@ -33,9 +33,9 @@
 
     <script>
         // *******************************************************************
-        // * KUNCI: GANTI DENGAN URL API YANG ANDA DAPATKAN DARI LANGKAH 2! *
+        // ** GANTI DENGAN URL API WEB APP BARU ANDA **
         // *******************************************************************
-        const API_URL = "https://script.google.com/macros/s/AKfycbwtdtq05cADw1Xo0cO3gakIlCNDqp9SE8F86d-IW58i7wmFHcZ2Q28nP4xPlZOP5PNa/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbyqCLFXXYhjioibiwrC57yHqd3LP37sHK04THUX4cO6WyrAC24E5woRrivr4LpdERA/exec"; 
 
         async function searchData() {
             const nameInput = document.getElementById('studentName').value.trim();
@@ -48,12 +48,16 @@
 
             outputDiv.innerHTML = '<div class="alert alert-info">⏳ Mencari data...</div>';
 
-            // Membuat URL lengkap untuk memanggil API dengan parameter 'nama'
             const fullUrl = `${API_URL}?nama=${encodeURIComponent(nameInput)}`;
 
             try {
                 const response = await fetch(fullUrl);
-                const result = await response.json(); // Menerima JSON dari Apps Script
+                
+                if (!response.ok) {
+                    throw new Error(`Server API merespons dengan status: ${response.status}`);
+                }
+
+                const result = await response.json(); 
 
                 if (result.status === 'success') {
                     outputDiv.innerHTML = 
@@ -67,14 +71,14 @@
                     outputDiv.innerHTML = 
                         `<div class="alert alert-warning">❌ Nama <strong>${nameInput}</strong> tidak ditemukan dalam daftar.</div>`;
                 } else {
-                    // Menangani error umum (misalnya: gagal akses Sheet)
+                    // Error dari Apps Script (misalnya, nama Sheet salah)
                     outputDiv.innerHTML = 
                         `<div class="alert alert-danger">🛑 Error API: ${result.message}</div>`;
                 }
             } catch (error) {
-                console.error('Fetch Error:', error);
+                console.error('Fetch/Koneksi Error:', error);
                 outputDiv.innerHTML = 
-                    '<div class="alert alert-danger">Gagal menghubungi server data. Cek koneksi internet atau URL API.</div>';
+                    `<div class="alert alert-danger">Gagal menghubungi server data. Pastikan URL API sudah diperbarui dan diotorisasi.</div>`;
             }
         }
     </script>
