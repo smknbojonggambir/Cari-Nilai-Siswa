@@ -31,7 +31,7 @@
         <div id="output" class="mt-4">Hasil akan muncul di sini...</div>
     </div>
 
- <script>
+<script>
     // *******************************************************************
     // ** GANTI DENGAN URL API WEB APP BARU ANDA **
     // *******************************************************************
@@ -58,19 +58,40 @@
             const result = await response.json(); 
 
             if (result.status === 'success') {
-                // Kunci Perbaikan: Lakukan loop untuk menampilkan semua mata pelajaran
+                let needsRemedial = false; // Variabel baru untuk menandai kebutuhan remedial
+                
                 let outputHTML = `<div class="alert alert-success">🎉 **${result.data[0].nama}** (${result.data[0].kelas}) Ditemukan:</div><hr>`;
                 
                 // Membuat tabel untuk menampilkan semua hasil
                 outputHTML += `<table class="table table-striped table-bordered">
-                                  <thead><tr><th>Mata Pelajaran</th><th>Nilai Akhir</th></tr></thead>
-                                  <tbody>`;
+                                    <thead><tr><th>Mata Pelajaran</th><th>Nilai Akhir</th></tr></thead>
+                                    <tbody>`;
 
                 result.data.forEach(item => {
-                    outputHTML += `<tr><td>${item.mapel}</td><td><strong>${item.nilai}</strong></td></tr>`;
+                    // Cek nilai dan beri penanda
+                    const score = parseFloat(item.nilai);
+                    let displayScore = `<strong>${item.nilai}</strong>`;
+
+                    if (score < 75) {
+                        needsRemedial = true;
+                        displayScore = `<strong class="text-danger">${item.nilai} (Wajib Remedial)</strong>`;
+                    }
+
+                    outputHTML += `<tr><td>${item.mapel}</td><td>${displayScore}</td></tr>`;
                 });
 
                 outputHTML += `</tbody></table>`;
+                
+                // Tambahkan pesan peringatan jika ada nilai di bawah 75
+                if (needsRemedial) {
+                    outputHTML += `
+                        <div class="alert alert-warning mt-3">
+                            <h5 class="alert-heading">⚠️ PERHATIAN</h5>
+                            Nilai di bawah 75 terdeteksi. Silakan segera hubungi guru mata pelajaran terkait untuk perbaikan sebelum nilai dientry ke raport siswa.
+                        </div>
+                    `;
+                }
+
                 outputDiv.innerHTML = outputHTML;
 
             } else if (result.status === 'not_found') {
