@@ -31,56 +31,62 @@
         <div id="output" class="mt-4">Hasil akan muncul di sini...</div>
     </div>
 
-    <script>
-        // *******************************************************************
-        // ** GANTI DENGAN URL API WEB APP BARU ANDA **
-        // *******************************************************************
-        const API_URL = "https://script.google.com/macros/s/AKfycbyqCLFXXYhjioibiwrC57yHqd3LP37sHK04THUX4cO6WyrAC24E5woRrivr4LpdERA/exec"; 
+ <script>
+    // *******************************************************************
+    // ** GANTI DENGAN URL API WEB APP BARU ANDA **
+    // *******************************************************************
+    const API_URL = "https://script.google.com/macros/s/AKfycbyqCLFXXYhjioibiwrC57yHqd3LP37sHK04THUX4cO6WyrAC24E5woRrivr4LpdERA/exec"; 
 
-        async function searchData() {
-            const nameInput = document.getElementById('studentName').value.trim();
-            const outputDiv = document.getElementById('output');
-            
-            if (!nameInput) {
-                outputDiv.innerHTML = '<div class="alert alert-warning">Masukkan nama siswa.</div>';
-                return;
-            }
-
-            outputDiv.innerHTML = '<div class="alert alert-info">⏳ Mencari data...</div>';
-
-            const fullUrl = `${API_URL}?nama=${encodeURIComponent(nameInput)}`;
-
-            try {
-                const response = await fetch(fullUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`Server API merespons dengan status: ${response.status}`);
-                }
-
-                const result = await response.json(); 
-
-                if (result.status === 'success') {
-                    outputDiv.innerHTML = 
-                        `<div class="alert alert-success">🎉 Hasil Ditemukan<hr>
-                        <strong>Nama:</strong> ${result.nama}<br>
-                        <strong>Kelas:</strong> ${result.kelas}<br>
-                        <strong>Mata Pelajaran:</strong> ${result.mapel}<br>
-                        <strong>Nilai Akhir:</strong> ${result.nilai}</div>`;
-
-                } else if (result.status === 'not_found') {
-                    outputDiv.innerHTML = 
-                        `<div class="alert alert-warning">❌ Nama <strong>${nameInput}</strong> tidak ditemukan dalam daftar.</div>`;
-                } else {
-                    // Error dari Apps Script (misalnya, nama Sheet salah)
-                    outputDiv.innerHTML = 
-                        `<div class="alert alert-danger">🛑 Error API: ${result.message}</div>`;
-                }
-            } catch (error) {
-                console.error('Fetch/Koneksi Error:', error);
-                outputDiv.innerHTML = 
-                    `<div class="alert alert-danger">Gagal menghubungi server data. Pastikan URL API sudah diperbarui dan diotorisasi.</div>`;
-            }
+    async function searchData() {
+        const nameInput = document.getElementById('studentName').value.trim();
+        const outputDiv = document.getElementById('output');
+        
+        if (!nameInput) {
+            outputDiv.innerHTML = '<div class="alert alert-warning">Masukkan nama siswa.</div>';
+            return;
         }
-    </script>
+
+        outputDiv.innerHTML = '<div class="alert alert-info">⏳ Mencari data...</div>';
+        const fullUrl = `${API_URL}?nama=${encodeURIComponent(nameInput)}`;
+
+        try {
+            const response = await fetch(fullUrl);
+            if (!response.ok) {
+                throw new Error(`Server API merespons dengan status: ${response.status}`);
+            }
+
+            const result = await response.json(); 
+
+            if (result.status === 'success') {
+                // Kunci Perbaikan: Lakukan loop untuk menampilkan semua mata pelajaran
+                let outputHTML = `<div class="alert alert-success">🎉 **${result.data[0].nama}** (${result.data[0].kelas}) Ditemukan:</div><hr>`;
+                
+                // Membuat tabel untuk menampilkan semua hasil
+                outputHTML += `<table class="table table-striped table-bordered">
+                                  <thead><tr><th>Mata Pelajaran</th><th>Nilai Akhir</th></tr></thead>
+                                  <tbody>`;
+
+                result.data.forEach(item => {
+                    outputHTML += `<tr><td>${item.mapel}</td><td><strong>${item.nilai}</strong></td></tr>`;
+                });
+
+                outputHTML += `</tbody></table>`;
+                outputDiv.innerHTML = outputHTML;
+
+            } else if (result.status === 'not_found') {
+                outputDiv.innerHTML = 
+                    `<div class="alert alert-warning">❌ Nama <strong>${nameInput}</strong> tidak ditemukan. Coba gunakan nama yang lebih singkat.</div>`;
+            } else {
+                // Error dari Apps Script
+                outputDiv.innerHTML = 
+                    `<div class="alert alert-danger">🛑 Error API: ${result.message}</div>`;
+            }
+        } catch (error) {
+            console.error('Fetch/Koneksi Error:', error);
+            outputDiv.innerHTML = 
+                `<div class="alert alert-danger">Gagal menghubungi server data. Pastikan URL API sudah diperbarui dan diotorisasi.</div>`;
+        }
+    }
+</script>
 </body>
 </html>
