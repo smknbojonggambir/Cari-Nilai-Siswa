@@ -2,17 +2,39 @@
 <style>
   body {
     background-color: #f8f9fa;
+    /* Memberi padding di semua sisi untuk responsivitas */
+    padding-top: 20px;
+    padding-bottom: 20px;
   }
   .container {
-    max-width: 400px;
-    margin-top: 50px;
+    /* Mengurangi lebar maksimum agar tidak terlalu lebar di desktop */
+    max-width: 500px;
     background: white;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  .btn-primary {
+    /* Membuat tombol hijau sesuai standar Bootstrap */
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
   }
   .alert {
+    /* Memastikan teks hasil tetap rapi */
+    font-weight: bold;
     word-wrap: break-word;
     white-space: pre-wrap;
+    line-height: 1.5;
+  }
+  /* Media Query (Opsional/Tambahan): Mengurangi padding di layar sangat kecil */
+  @media (max-width: 576px) {
+    .container {
+      padding: 15px;
+      margin: 10px;
+    }
   }
 </style>
